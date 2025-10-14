@@ -153,3 +153,84 @@ class Item:
 
     def esta_disponible_para(self, tipo: str) -> bool:
         pass
+
+    class Videojuego(Item):
+    def _init_(
+        self,
+        id: str,
+        titulo: str,
+        consola_sistema: str,
+        genero: str,
+        stock: int,
+        disponibilidad: List[str] = None,
+        precio: Decimal = Decimal("0.0"),
+    ):
+        super()._init_(id=id, titulo=titulo, stock=stock, disponibilidad=disponibilidad, precio=precio)
+        self.consola_sistema: str = consola_sistema
+        self.genero: str = genero
+
+
+class Disco(Item):
+    def _init_(
+        self,
+        id: str,
+        titulo: str,
+        genero_musical: str,
+        formato: str,
+        stock: int,
+        disponibilidad: List[str] = None,
+        precio: Decimal = Decimal("0.0"),
+    ):
+        super()._init_(id=id, titulo=titulo, stock=stock, disponibilidad=disponibilidad, precio=precio)
+        self.genero_musical: str = genero_musical
+        self.formato: str = formato
+
+
+class Consola(Item):
+    def _init_(
+        self,
+        id: str,
+        titulo: str,
+        marca_modelo: str,
+        estado: str,
+        stock: int,
+        disponibilidad: List[str] = None,
+        precio: Decimal = Decimal("0.0"),
+    ):
+        super()._init_(id=id, titulo=titulo, stock=stock, disponibilidad=disponibilidad, precio=precio)
+        self.marca_modelo: str = marca_modelo
+        self.estado: str = estado
+
+
+class Audiolibro(Item):
+    def _init_(
+        self,
+        id: str,
+        titulo: str,
+        genero_literario: str,
+        narrador: str,
+        formato_digital: bool,
+        stock: int,
+        disponibilidad: List[str] = None,
+        precio: Decimal = Decimal("0.0"),
+    ):
+        super()._init_(id=id, titulo=titulo, stock=stock, disponibilidad=disponibilidad, precio=precio)
+        self.genero_literario: str = genero_literario
+        self.narrador: str = narrador
+        self.formato_digital: bool = formato_digital
+
+
+class Pelicula(Item):
+    def _init_(
+        self,
+        id: str,
+        titulo: str,
+        genero_cinematografico: str,
+        formato: str,
+        stock: int,
+        disponibilidad: List[str] = None,
+        precio: Decimal = Decimal("0.0"),
+    ):
+        super()._init_(id=id, titulo=titulo, stock=stock, disponibilidad=disponibilidad, precio=precio)
+        self.genero_cinematografico: str = genero_cinematografico
+        self.formato: str = formato
