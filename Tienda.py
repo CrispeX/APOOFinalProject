@@ -136,7 +136,7 @@ class Item:
         self.id: str = id
         self.titulo: str = titulo
         self.stock: int = stock
-        self.disponibilidad: List[str] = disponibilidad or []
+        self.disponibilidad: List[str] = disponibilidad
         self.precio: Decimal = precio
 
     def consultar_detalles(self):
