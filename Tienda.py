@@ -1,2 +1,4 @@
-class Video:
-    pass
+def hola():
+    print("hola")
+
+hola()
