@@ -1,3 +1,4 @@
+
 from datetime import date
 from decimal import Decimal
 
@@ -20,10 +21,24 @@ class Usuario:
         self.historial_prestamos: List[str] = historial_prestamos or []
 
     def seleccionar_rol(self, rol: str):
-        pass
+        self.rol_seleccionado = rol
+        print(f"El rol '{rol}' ha sido seleccionado para el usuario {self.nombre}.")
 
     def ver_historial(self):
-        pass
+        print(f"\nHistorial del usuario: {self.nombre}")
+        print("Compras realizadas:")
+        if self.historial_compras:
+            for compra in self.historial_compras:
+                print(f" - {compra}")
+        else:
+            print(" (sin compras registradas)")
+
+        print("\nPréstamos realizados:")
+        if self.historial_prestamos:
+            for prestamo in self.historial_prestamos:
+                print(f" - {prestamo}")
+        else:
+            print(" (sin préstamos registrados)")
 
     def solicitar_prestamo(self, item_id: str):
         pass
@@ -62,6 +77,7 @@ class Admin(Usuario):
 
     def ver_reporte(self, tipo: str):
         pass
+
 
 class Carrito:
     def _init_(self, carrito_id: str, items: Dict[str, int] = None, total: Decimal = Decimal("0.0")):
@@ -124,6 +140,8 @@ class ServicioStock:
 
     def verificar_disponibilidad(self, item_id: str) -> bool:
         pass
+
+
 class Item:
     def _init_(
         self,
@@ -154,20 +172,21 @@ class Item:
     def esta_disponible_para(self, tipo: str) -> bool:
         pass
 
+
     class Videojuego(Item):
-    def _init_(
-        self,
-        id: str,
-        titulo: str,
-        consola_sistema: str,
-        genero: str,
-        stock: int,
-        disponibilidad: List[str] = None,
-        precio: Decimal = Decimal("0.0"),
-    ):
-        super()._init_(id=id, titulo=titulo, stock=stock, disponibilidad=disponibilidad, precio=precio)
-        self.consola_sistema: str = consola_sistema
-        self.genero: str = genero
+        def _init_(
+            self,
+            id: str,
+            titulo: str,
+            consola_sistema: str,
+            genero: str,
+            stock: int,
+            disponibilidad: List[str] = None,
+            precio: Decimal = Decimal("0.0"),
+        ):
+            super()._init_(id=id, titulo=titulo, stock=stock, disponibilidad=disponibilidad, precio=precio)
+            self.consola_sistema: str = consola_sistema
+            self.genero: str = genero
 
 
 class Disco(Item):
