@@ -1,4 +1,3 @@
-
 from datetime import date
 from decimal import Decimal
 
@@ -10,15 +9,15 @@ class Usuario:
         nombre: str,
         is_guest: bool = False,
         rol_seleccionado: str = "",
-        historial_compras: List[str] = None,
-        historial_prestamos: List[str] = None,
+        historial_compras: List[str] = [],
+        historial_prestamos: List[str] = [],
     ):
         self.user_id: str = user_id
         self.nombre: str = nombre
         self.is_guest: bool = is_guest
         self.rol_seleccionado: str = rol_seleccionado
-        self.historial_compras: List[str] = historial_compras or []
-        self.historial_prestamos: List[str] = historial_prestamos or []
+        self.historial_compras: List[str] = historial_compras 
+        self.historial_prestamos: List[str] = historial_prestamos
 
     def seleccionar_rol(self, rol: str):
         self.rol_seleccionado = rol
@@ -41,10 +40,23 @@ class Usuario:
             print(" (sin préstamos registrados)")
 
     def solicitar_prestamo(self, item_id: str):
-        pass
+        if self.rol_seleccionado != "Usuario":
+            print("Para solicitar un prestamos debe tener el rol de usuario")
+            return False
+        if item_id in self.historial_prestamos:
+            print("Ya este objeto a sido prestado")
+            return False
+        self.historial_prestamos.append(item_id)
+        print(f"Solicitud de préstamo registrada: usuario={self.nombre}, item={item_id} el dia {date.today()}")
+        return True
 
     def comprar(self, item_id: str):
-        pass
+        if self.rol_seleccionado != "Usuario":
+            print("Para realizar una compra debe tener el rol de usuario")
+            return False
+        self.historial_compras.append(item_id)
+        print(f"Solicitud de compra registrada: usuario={self.nombre}, item={item_id} el dia {date.today()}")
+        return True
 
 
 class Admin(Usuario):
