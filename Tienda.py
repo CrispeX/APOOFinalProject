@@ -6,25 +6,21 @@ class Usuario:
     def __init__(
         self,
         identificador: str,
-        nombre: str,
-        es_invitado: bool = False,
         rol_seleccionado: str = "",
         historial_compras: list = None,
         historial_prestamos: list = None,
     ):
         self.identificador = identificador
-        self.nombre = nombre
-        self.es_invitado = es_invitado
         self.rol_seleccionado = rol_seleccionado
         self.historial_compras = historial_compras or []
         self.historial_prestamos = historial_prestamos or []
 
     def seleccionar_rol(self, rol: str):
         self.rol_seleccionado = rol
-        print(f"El rol '{rol}' ha sido seleccionado para el usuario {self.nombre}.")
+        print(f"El rol '{rol}' ha sido seleccionado.")
 
     def ver_historial(self):
-        print(f"\nHistorial del usuario: {self.nombre}")
+        print(f"\nHistorial del usuario: {self.identificador}")
         print("Compras realizadas:")
         if self.historial_compras:
             for compra in self.historial_compras:
@@ -39,7 +35,6 @@ class Usuario:
         else:
             print(" (sin préstamos registrados)")
 
-    # ahora recibe el servicio de stock y la lista de prestamos (no hay globales)
     def solicitar_prestamo(self, codigo_articulo: str, servicio_stock, lista_prestamos: list):
         if self.rol_seleccionado != "Usuario":
             print("Para solicitar un préstamo debe tener el rol 'Usuario'.")
@@ -59,16 +54,15 @@ class Usuario:
         )
         lista_prestamos.append(prestamo)
         self.historial_prestamos.append(id_prestamo)
-        print(f"Préstamo registrado: id={id_prestamo}, usuario={self.nombre}, artículo={codigo_articulo}")
+        print(f"Préstamo registrado: id={id_prestamo}, usuario={self.identificador}, artículo={codigo_articulo}")
         return True
 
-    # carrito y servicio_stock se pasan como parámetros
     def comprar(self, codigo_articulo: str, carrito, servicio_stock):
         if self.rol_seleccionado != "Usuario":
             print("Para realizar una compra debe tener el rol 'Usuario'.")
             return False
         carrito.agregar_item(codigo_articulo, 1)
-        print(f"Artículo {codigo_articulo} agregado al carrito de {self.nombre}.")
+        print(f"Artículo {codigo_articulo} agregado al carrito de {self.identificador}.")
         return True
 
 
@@ -76,15 +70,12 @@ class Administrador(Usuario):
     def __init__(
         self,
         identificador: str,
-        nombre: str,
-        es_invitado: bool = False,
         rol_seleccionado: str = "Admin",
         historial_compras: list = None,
         historial_prestamos: list = None,
     ):
-        super().__init__(identificador, nombre, es_invitado, rol_seleccionado, historial_compras, historial_prestamos)
+        super().__init__(identificador, rol_seleccionado, historial_compras, historial_prestamos)
 
-    # los métodos reciben el catálogo y la lista de usuarios cuando hace falta
     def agregar_item(self, articulo, catalogo: dict):
         catalogo[articulo.codigo] = articulo
         print(f"Artículo agregado: {articulo.codigo} - {articulo.titulo}")
@@ -117,7 +108,7 @@ class Administrador(Usuario):
         elif tipo == "usuarios":
             print("Reporte de usuarios:")
             for u in lista_usuarios:
-                print(f"- {u.identificador} | {u.nombre} | rol: {u.rol_seleccionado}")
+                print(f"- {u.identificador} | rol: {u.rol_seleccionado}")
         else:
             print("Tipo de reporte desconocido. Use 'items' o 'usuarios'.")
 
@@ -125,7 +116,7 @@ class Administrador(Usuario):
 class Carrito:
     def __init__(self, identificador_carrito: str, articulos: dict = None, total: Decimal = Decimal("0.0")):
         self.identificador_carrito = identificador_carrito
-        self.articulos = articulos or {}  # codigo_item -> cantidad
+        self.articulos = articulos or {}
         self.total = total
 
     def agregar_item(self, codigo_item: str, cantidad: int):
@@ -138,7 +129,6 @@ class Carrito:
         if codigo_item in self.articulos:
             del self.articulos[codigo_item]
 
-    # calcular_total recibe el catálogo como parámetro
     def calcular_total(self, catalogo: dict) -> Decimal:
         total = Decimal("0.0")
         for codigo_item, cantidad in self.articulos.items():
@@ -148,7 +138,6 @@ class Carrito:
         self.total = total
         return total
 
-    # checkout recibe servicio_stock y el catálogo (ya no hay globales)
     def checkout(self, usuario: Usuario, servicio_stock, catalogo: dict):
         for codigo_item, cantidad in list(self.articulos.items()):
             articulo = catalogo.get(codigo_item)
@@ -162,7 +151,7 @@ class Carrito:
             servicio_stock.decrementar_por_compra(codigo_item, cantidad)
             usuario.historial_compras.append(codigo_item)
         total = self.calcular_total(catalogo)
-        print(f"Compra realizada por {usuario.nombre}. Total: {total} (artículos: {self.articulos})")
+        print(f"Compra realizada por {usuario.identificador}. Total: {total} (artículos: {self.articulos})")
         self.articulos = {}
         self.total = Decimal("0.0")
         return True
@@ -204,7 +193,6 @@ class Prestamo:
         return multa
 
 
-# ahora ServicioStock recibe el catálogo cuando se crea
 class ServicioStock:
     def __init__(self, catalogo: dict):
         self.catalogo = catalogo
@@ -266,20 +254,15 @@ class Item:
         return tipo in self.disponibilidad or not self.disponibilidad
 
 
-# --- Funciones que crean datos y muestran menús (ya no usan globales) ---
-
-
 def crear_datos_iniciales():
     usuarios = []
     catalogo_items = {}
     prestamos = []
 
-    # usuarios: uno "Usuario" y uno "Admin"
-    u1 = Usuario("usuario1", "Mariana", es_invitado=False, rol_seleccionado="Usuario")
-    u2 = Administrador("administrador1", "Carlos", es_invitado=False, rol_seleccionado="Admin")
+    u1 = Usuario("usuario1", rol_seleccionado="Usuario")
+    u2 = Administrador("administrador1", rol_seleccionado="Admin")
     usuarios.extend([u1, u2])
 
-    # Artículos
     a1 = Item("art1", "Juego: Aventura", stock=3, disponibilidad=["prestamo", "venta"], precio=Decimal("19.99"))
     a2 = Item("art2", "Película: Ciencia Ficción", stock=2, disponibilidad=["venta"], precio=Decimal("9.50"))
     a3 = Item("art3", "Disco: Pop Hits", stock=5, disponibilidad=["prestamo", "venta"], precio=Decimal("7.25"))
@@ -300,7 +283,7 @@ def mostrar_catalogo(catalogo: dict):
 
 def buscar_primer_usuario_por_rol(rol: str, lista_usuarios: list):
     for u in lista_usuarios:
-        if u.rol_seleccionado.lower() == rol.lower():
+        if u.rol_seleccionado and u.rol_seleccionado.lower() == rol.lower():
             return u
     return None
 
@@ -319,7 +302,7 @@ def menu_principal(lista_usuarios: list, catalogo: dict, lista_prestamos: list, 
             if existente:
                 usuario_actual = existente
             else:
-                usuario_actual = Usuario("usuario_temporal", "Usuario", es_invitado=True, rol_seleccionado="Usuario")
+                usuario_actual = Usuario("usuario_temporal", rol_seleccionado="Usuario")
             carrito_actual = Carrito(f"carrito_{usuario_actual.identificador}")
             print(f"Sesión iniciada como USUARIO (id: {usuario_actual.identificador}).")
             menu_usuario(usuario_actual, carrito_actual, catalogo, lista_prestamos, servicio_stock)
@@ -328,7 +311,7 @@ def menu_principal(lista_usuarios: list, catalogo: dict, lista_prestamos: list, 
             if existente:
                 administrador_actual = existente
             else:
-                administrador_actual = Administrador("admin_temporal", "Admin", es_invitado=True, rol_seleccionado="Admin")
+                administrador_actual = Administrador("admin_temporal", rol_seleccionado="Admin")
             print(f"Sesión iniciada como ADMIN (id: {administrador_actual.identificador}).")
             menu_admin(administrador_actual, catalogo, lista_usuarios)
         elif opcion == "3":
@@ -434,7 +417,6 @@ def menu_admin(administrador: Administrador, catalogo: dict, lista_usuarios: lis
 if __name__ == "__main__":
     usuarios, catalogo_items, prestamos, servicio_stock = crear_datos_iniciales()
     menu_principal(usuarios, catalogo_items, prestamos, servicio_stock)
-
 """app = tk.Tk()
 #Dimensiones de la pestaña
 app.geometry("300x600")
@@ -442,8 +424,18 @@ app.config(background="black")
 tk.Wm.wm_title(app, "Tienda de contenido audio visual")
 tk.Button(
     app,
-    text="Click me",
-    background="White"
+    text="Ingresar como usuario",
+    background="White",
+    command=menu_usuario,
+).pack(
+    fill=tk.BOTH,
+    expand=True,
+)
+tk.Button(
+    app,
+    text="Ingresar como administrador",
+    background="White",
+    command=menu_admin,
 ).pack(
     fill=tk.BOTH,
     expand=True,
