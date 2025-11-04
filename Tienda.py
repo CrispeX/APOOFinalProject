@@ -12,8 +12,8 @@ class Usuario:
     ):
         self.identificador = identificador
         self.rol_seleccionado = rol_seleccionado
-        self.historial_compras = historial_compras or []
-        self.historial_prestamos = historial_prestamos or []
+        self.historial_compras = historial_compras 
+        self.historial_prestamos = historial_prestamos 
 
     def seleccionar_rol(self, rol: str):
         self.rol_seleccionado = rol
